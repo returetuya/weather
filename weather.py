@@ -30,15 +30,15 @@ def gettenki():
 
    for ten in data['list']:
 
-       weatherDescription = item['weather'][0]['description']
+       weatherDescription = ten['weather'][0]['description']
        forecastDatetime = datetime.datetime.fromtimestamp(ten['dt'])
-       temperature = item['main']['temp']
+       temperature = ten['main']['temp']
        rainfall=0
 
        if 'rain' in ten and '3h' in ten['rain']:
            rainfall = ten['rain']['3h']
 
-        zikoku = [tenki for tenki in ten if [x,y,z,l] in tenki]
+        zikoku = [tenki for tenki in ten if [x,y,z,l] in forecastDatetime]
 
         print('日時:{0} 天気:{1} 気温(℃):{2} 雨量(mm):{3}'.format(
            zikoku, weatherDescription, temperature, rainfall))
