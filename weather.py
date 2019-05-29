@@ -4,43 +4,54 @@ import datetime
 from pytz import timezone
 import os
 import sys
+import re
 
-apikey='*****************'
+apikey='***************'
 cities="169-0072,JP"
 
 api= 'http://api.openweathermap.org/data/2.5/forecast?zip={0}&units=metric&lang=ja&APPID={1}'
 
+k2c=lambda k:k-272.15
 
-num1= input("西暦を教えてください(ex.2018)")
-num2=input("何月か教えてください(ex.04)")
-num3=input("何日か教えてください(ex.01)")
-num4=input("時間を教えてください(ex.12)")
-
-x,y,z,l=int(num1),int(num2),int(num3),int(num4)
 def gettenki():
-   url =api.format(cities,apikey)
-   r= requests.get(url)
-   data=json.loads(r.text)
+    url =api.format(cities,apikey)
+    r= requests.get(url)
+    data=json.loads(r.text)
+    
+    if not ('list' in data):
+        print('error')
+        return
+    
+    for tenki in data['list']:
+        
+        forecastDatetime = datetime.datetime.fromtimestamp(tenki['dt'])
+        rainfall=0
+        weatherDescription = tenki['weather'][0]['description']
+        temperature = tenki['main']['temp']
+        weather_info ={}
+        weather_info['日時'] = forecastDatetime
+        
+        weather_list = []
+        weather_list.append(weather_info)
+        
+        if 'rain' in tenki and '3h' in tenki['rain']:
+            rainfall = tenki['rain']['3h']
+            weather_info['日時'] = forecastDatetime
+    
+    return weather_list
+    
 
 
 
-   if not ('list' in data):
-       print('error')
-       return
+# num1= input("いつの天気が知りたいですか？（ex.20190817）")
 
-   for ten in data['list']:
+# from datetime import datetime as dt
+# adt = dt.strptime(num1, '%Y%m%d')
+# newstr = adt.strftime('%Y-%m-%d')
+# print(newstr)
 
-       weatherDescription = ten['weather'][0]['description']
-       forecastDatetime = datetime.datetime.fromtimestamp(ten['dt'])
-       temperature = ten['main']['temp']
-       rainfall=0
 
-       if 'rain' in ten and '3h' in ten['rain']:
-           rainfall = ten['rain']['3h']
+# import re
+#for row in weather_list:
+ #   re.findall(adt, row)
 
-        zikoku = [tenki for tenki in ten if [x,y,z,l] in forecastDatetime]
-
-        print('日時:{0} 天気:{1} 気温(℃):{2} 雨量(mm):{3}'.format(
-           zikoku, weatherDescription, temperature, rainfall))
-
-       
